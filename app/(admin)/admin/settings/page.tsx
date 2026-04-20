@@ -72,7 +72,7 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="p-8 max-w-2xl">
+    <div className="p-4 sm:p-6 lg:p-8 max-w-2xl">
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-gray-900">Cài đặt</h1>
         <p className="text-sm text-gray-500 mt-1">Quản lý thông tin nhà hàng</p>

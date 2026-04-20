@@ -89,7 +89,7 @@ export default function HistoryPage() {
   const totalItems = sessions.flatMap((s) => s.orders.flatMap((o) => o.items)).reduce((sum, i) => sum + i.quantity, 0);
 
   return (
-    <div className="p-8">
+    <div className="p-4 sm:p-6 lg:p-8">
       <div className="flex items-start justify-between mb-6 flex-wrap gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Lịch sử đơn hàng</h1>

@@ -53,10 +53,10 @@ interface Order {
 
 function tableColorClass(status: Table["status"]): string {
   switch (status) {
-    case "ready":          return "bg-gray-50 border-gray-200";
-    case "occupied":       return "bg-blue-50 border-blue-200";
+    case "ready":             return "bg-gray-50 border-gray-200";
+    case "occupied":          return "bg-blue-50 border-blue-200";
     case "payment_requested": return "bg-yellow-100 border-yellow-300";
-    default:               return "bg-gray-50 border-gray-200";
+    default:                  return "bg-gray-50 border-gray-200";
   }
 }
 
@@ -81,39 +81,28 @@ function InvoiceModal({
     0
   );
 
-  function handlePrint() {
-    window.print();
-  }
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center print:static print:inset-auto">
-      <div
-        className="absolute inset-0 bg-black/50 print:hidden"
-        onClick={onClose}
-      />
-      <div className="relative z-10 bg-white rounded-xl shadow-2xl w-full max-w-md mx-4 overflow-hidden print:shadow-none print:rounded-none print:max-w-full print:m-0">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center print:static print:inset-auto">
+      <div className="absolute inset-0 bg-black/50 print:hidden" onClick={onClose} />
+      <div className="relative z-10 bg-white w-full sm:rounded-xl shadow-2xl sm:max-w-md sm:mx-4 rounded-t-2xl overflow-hidden print:shadow-none print:rounded-none print:max-w-full print:m-0">
         {/* Toolbar */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 print:hidden">
           <span className="font-semibold text-gray-800">Preview hóa đơn</span>
           <div className="flex gap-2">
-            <Button variant="primary" size="sm" onClick={handlePrint}>
+            <Button variant="primary" size="sm" onClick={() => window.print()}>
               🖨️ In hóa đơn
             </Button>
-            <Button variant="ghost" size="sm" onClick={onClose}>
-              ✕
-            </Button>
+            <Button variant="ghost" size="sm" onClick={onClose}>✕</Button>
           </div>
         </div>
 
         {/* Invoice content */}
-        <div className="p-6 space-y-4 print:p-4" id="invoice-content">
-          {/* Header */}
+        <div className="p-6 space-y-4 print:p-4 overflow-y-auto max-h-[75vh] sm:max-h-[80vh]" id="invoice-content">
           <div className="text-center border-b border-dashed border-gray-300 pb-4">
             <p className="text-xl font-bold">NHÀ HÀNG DEMO</p>
             <p className="text-sm text-gray-500 mt-1">HÓA ĐƠN THANH TOÁN</p>
           </div>
 
-          {/* Table info */}
           <div className="text-sm space-y-1">
             <div className="flex justify-between">
               <span className="text-gray-500">Bàn:</span>
@@ -131,7 +120,6 @@ function InvoiceModal({
             </div>
           </div>
 
-          {/* Items */}
           <div className="border-t border-dashed border-gray-300 pt-3">
             <table className="w-full text-sm">
               <thead>
@@ -146,10 +134,7 @@ function InvoiceModal({
                 {activeOrders.map((order, idx) => (
                   <Fragment key={order.id}>
                     <tr>
-                      <td
-                        colSpan={4}
-                        className="py-1.5 text-xs text-gray-400 italic"
-                      >
+                      <td colSpan={4} className="py-1.5 text-xs text-gray-400 italic">
                         Lần gọi #{idx + 1} — {formatDate(order.calledAt)}
                       </td>
                     </tr>
@@ -159,12 +144,8 @@ function InvoiceModal({
                         <tr key={item.id}>
                           <td className="py-1.5 text-gray-800">{item.menuItem.name}</td>
                           <td className="py-1.5 text-center text-gray-600">{item.quantity}</td>
-                          <td className="py-1.5 text-right text-gray-600">
-                            {formatPrice(item.priceAtOrder)}
-                          </td>
-                          <td className="py-1.5 text-right font-medium">
-                            {formatPrice(item.priceAtOrder * item.quantity)}
-                          </td>
+                          <td className="py-1.5 text-right text-gray-600">{formatPrice(item.priceAtOrder)}</td>
+                          <td className="py-1.5 text-right font-medium">{formatPrice(item.priceAtOrder * item.quantity)}</td>
                         </tr>
                       ))}
                   </Fragment>
@@ -173,7 +154,6 @@ function InvoiceModal({
             </table>
           </div>
 
-          {/* Total */}
           <div className="border-t-2 border-gray-800 pt-3 flex justify-between items-center">
             <span className="font-bold text-lg">TỔNG CỘNG</span>
             <span className="font-bold text-xl text-orange-600">{formatPrice(grandTotal)}</span>
@@ -185,7 +165,6 @@ function InvoiceModal({
         </div>
       </div>
 
-      {/* Print styles */}
       <style jsx global>{`
         @media print {
           body > *:not(#__next) { display: none !important; }
@@ -194,6 +173,152 @@ function InvoiceModal({
         }
       `}</style>
     </div>
+  );
+}
+
+// ---- Order Panel (shared between desktop sidebar + mobile sheet) ----
+
+function OrderPanel({
+  table,
+  orders,
+  ordersLoading,
+  actionLoading,
+  collapsedOrders,
+  onClose,
+  onShowInvoice,
+  onProcessPayment,
+  onMarkOrderDone,
+  onMarkOrderCancelled,
+  onMarkItemDone,
+  onMarkItemCancelled,
+  onToggleCollapse,
+}: {
+  table: Table;
+  orders: Order[];
+  ordersLoading: boolean;
+  actionLoading: string | null;
+  collapsedOrders: Set<string>;
+  onClose: () => void;
+  onShowInvoice: () => void;
+  onProcessPayment: (sessionId: string) => void;
+  onMarkOrderDone: (orderId: string) => void;
+  onMarkOrderCancelled: (orderId: string) => void;
+  onMarkItemDone: (orderId: string, itemId: string) => void;
+  onMarkItemCancelled: (orderId: string, itemId: string) => void;
+  onToggleCollapse: (orderId: string) => void;
+}) {
+  if (table.status === "ready") {
+    return (
+      <div className="flex flex-col items-center justify-center h-40 text-gray-400 p-6">
+        <span className="text-4xl mb-2">✅</span>
+        <p className="text-sm font-medium">Bàn {table.number} đang trống</p>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      {/* Panel header */}
+      <div className="px-4 py-3 bg-white border-b border-gray-200 shrink-0">
+        <div className="flex items-start justify-between gap-2">
+          <div>
+            <h2 className="font-bold text-gray-800">{table.name || `Bàn ${table.number}`}</h2>
+            <div className="flex items-center gap-2 mt-0.5">
+              <Badge status={table.status} />
+              {table.activeSession && (
+                <span className="text-xs text-gray-400">{formatDate(table.activeSession.startedAt)}</span>
+              )}
+            </div>
+          </div>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-lg leading-none mt-0.5">✕</button>
+        </div>
+        <div className="flex gap-2 mt-3 flex-wrap">
+          {orders.length > 0 && (
+            <Button variant="secondary" size="sm" onClick={onShowInvoice}>
+              🧾 Preview hóa đơn
+            </Button>
+          )}
+          {table.status === "payment_requested" && table.activeSession && (
+            <Button
+              variant="success"
+              size="sm"
+              loading={actionLoading === `payment-${table.activeSession.id}`}
+              onClick={() => onProcessPayment(table.activeSession!.id)}
+            >
+              ✅ Đã thanh toán
+            </Button>
+          )}
+        </div>
+      </div>
+
+      {/* Orders list */}
+      <div className="flex-1 overflow-y-auto p-3 space-y-3">
+        {ordersLoading ? (
+          <div className="flex items-center justify-center h-32">
+            <span className="h-6 w-6 animate-spin rounded-full border-2 border-orange-500 border-t-transparent" />
+          </div>
+        ) : orders.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-10 text-gray-400 bg-white rounded-xl border border-gray-100">
+            <span className="text-3xl mb-2">📋</span>
+            <p className="text-sm font-medium">Chưa có đơn hàng nào</p>
+          </div>
+        ) : (
+          orders.map((order, idx) => {
+            const isCollapsed = collapsedOrders.has(order.id);
+            const orderTotal = order.items
+              .filter((i) => i.status !== "cancelled")
+              .reduce((s, i) => s + i.priceAtOrder * i.quantity, 0);
+            return (
+              <div key={order.id} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                <div
+                  className="flex items-center justify-between gap-2 px-3 py-2.5 bg-gray-50 border-b border-gray-100 cursor-pointer select-none hover:bg-gray-100 transition-colors"
+                  onClick={() => onToggleCollapse(order.id)}
+                >
+                  <div className="flex items-center gap-1.5 flex-wrap min-w-0">
+                    <span className={`text-gray-400 text-xs transition-transform ${isCollapsed ? "-rotate-90" : ""}`}>▼</span>
+                    <span className="text-xs font-semibold text-gray-700">#{idx + 1}</span>
+                    <Badge status={order.status} />
+                    <span className="text-xs text-gray-400 truncate">{formatDate(order.calledAt)}</span>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <span className="text-xs font-medium text-gray-600">{formatPrice(orderTotal)}</span>
+                    {order.status === "pending" && (
+                      <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
+                        <Button variant="success" size="sm" loading={actionLoading === `order-done-${order.id}`} onClick={() => onMarkOrderDone(order.id)}>✓ Done</Button>
+                        <Button variant="danger" size="sm" loading={actionLoading === `order-cancel-${order.id}`} onClick={() => onMarkOrderCancelled(order.id)}>Hủy</Button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {!isCollapsed && (
+                  <ul className="divide-y divide-gray-50">
+                    {order.items.map((item) => (
+                      <li key={item.id} className="px-3 py-2.5 flex items-center gap-2">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <span className="text-sm font-medium text-gray-800 truncate">{item.menuItem.name}</span>
+                            <span className="text-gray-400 text-xs">×{item.quantity}</span>
+                            <Badge status={item.status} />
+                          </div>
+                          <p className="text-xs text-gray-400 mt-0.5">{formatPrice(item.priceAtOrder * item.quantity)}</p>
+                        </div>
+                        {item.status === "pending" && (
+                          <div className="flex gap-1 shrink-0">
+                            <Button variant="success" size="sm" loading={actionLoading === `item-done-${item.id}`} onClick={() => onMarkItemDone(order.id, item.id)}>✓</Button>
+                            <Button variant="danger" size="sm" loading={actionLoading === `item-cancel-${item.id}`} onClick={() => onMarkItemCancelled(order.id, item.id)}>✕</Button>
+                          </div>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            );
+          })
+        )}
+      </div>
+    </>
   );
 }
 
@@ -210,39 +335,28 @@ export default function ServerPage() {
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [collapsedOrders, setCollapsedOrders] = useState<Set<string>>(new Set());
   const [showInvoice, setShowInvoice] = useState(false);
+  // holds table+orders snapshot after payment so invoice can still be printed
+  const [paidData, setPaidData] = useState<{ table: Table; orders: Order[] } | null>(null);
   const sseRef = useRef<EventSource | null>(null);
 
-  // ---- Fetch helpers ----
-
-  const handleUnauthorized = useCallback(() => {
-    router.push("/server/login");
-  }, [router]);
+  const handleUnauthorized = useCallback(() => router.push("/server/login"), [router]);
 
   const fetchTables = useCallback(async () => {
     try {
       const res = await fetch("/api/server/tables", { credentials: "include" });
       if (res.status === 401) { handleUnauthorized(); return; }
       if (res.ok) setTables(await res.json());
-    } catch { /* ignore */ } finally {
-      setLoading(false);
-    }
+    } catch { /* ignore */ } finally { setLoading(false); }
   }, [handleUnauthorized]);
 
-  const fetchOrders = useCallback(
-    async (tableId: string) => {
-      setOrdersLoading(true);
-      try {
-        const res = await fetch(`/api/server/orders?tableId=${tableId}`, { credentials: "include" });
-        if (res.status === 401) { handleUnauthorized(); return; }
-        if (res.ok) setOrders(await res.json());
-      } catch { /* ignore */ } finally {
-        setOrdersLoading(false);
-      }
-    },
-    [handleUnauthorized]
-  );
-
-  // ---- SSE ----
+  const fetchOrders = useCallback(async (tableId: string) => {
+    setOrdersLoading(true);
+    try {
+      const res = await fetch(`/api/server/orders?tableId=${tableId}`, { credentials: "include" });
+      if (res.status === 401) { handleUnauthorized(); return; }
+      if (res.ok) setOrders(await res.json());
+    } catch { /* ignore */ } finally { setOrdersLoading(false); }
+  }, [handleUnauthorized]);
 
   useEffect(() => {
     fetchTables();
@@ -252,7 +366,7 @@ export default function ServerPage() {
       try {
         const event = JSON.parse(e.data);
         const { type, tableId } = event;
-        if (type === "new_order" || type === "table_occupied" || type === "payment_requested") {
+        if (["new_order", "table_occupied", "payment_requested"].includes(type)) {
           fetchTables();
           setSelectedTableId((cur) => { if (cur && cur === tableId) fetchOrders(cur); return cur; });
         } else if (type === "order_updated") {
@@ -270,13 +384,10 @@ export default function ServerPage() {
     setShowInvoice(false);
   }, [selectedTableId, fetchOrders]);
 
-  // ---- Actions ----
-
   function toggleCollapse(orderId: string) {
     setCollapsedOrders((prev) => {
       const next = new Set(prev);
-      if (next.has(orderId)) next.delete(orderId);
-      else next.add(orderId);
+      if (next.has(orderId)) next.delete(orderId); else next.add(orderId);
       return next;
     });
   }
@@ -284,10 +395,7 @@ export default function ServerPage() {
   async function markOrderDone(orderId: string) {
     setActionLoading(`order-done-${orderId}`);
     try {
-      const res = await fetch(`/api/server/orders/${orderId}`, {
-        method: "PUT", headers: { "Content-Type": "application/json" },
-        credentials: "include", body: JSON.stringify({ status: "done" }),
-      });
+      const res = await fetch(`/api/server/orders/${orderId}`, { method: "PUT", headers: { "Content-Type": "application/json" }, credentials: "include", body: JSON.stringify({ status: "done" }) });
       if (res.status === 401) { handleUnauthorized(); return; }
       if (res.ok && selectedTableId) { fetchOrders(selectedTableId); fetchTables(); }
     } finally { setActionLoading(null); }
@@ -296,10 +404,7 @@ export default function ServerPage() {
   async function markOrderCancelled(orderId: string) {
     setActionLoading(`order-cancel-${orderId}`);
     try {
-      const res = await fetch(`/api/server/orders/${orderId}`, {
-        method: "PUT", headers: { "Content-Type": "application/json" },
-        credentials: "include", body: JSON.stringify({ status: "cancelled" }),
-      });
+      const res = await fetch(`/api/server/orders/${orderId}`, { method: "PUT", headers: { "Content-Type": "application/json" }, credentials: "include", body: JSON.stringify({ status: "cancelled" }) });
       if (res.status === 401) { handleUnauthorized(); return; }
       if (res.ok && selectedTableId) { fetchOrders(selectedTableId); fetchTables(); }
     } finally { setActionLoading(null); }
@@ -308,10 +413,7 @@ export default function ServerPage() {
   async function markItemDone(orderId: string, itemId: string) {
     setActionLoading(`item-done-${itemId}`);
     try {
-      const res = await fetch(`/api/server/orders/${orderId}/items/${itemId}`, {
-        method: "PUT", headers: { "Content-Type": "application/json" },
-        credentials: "include", body: JSON.stringify({ status: "done" }),
-      });
+      const res = await fetch(`/api/server/orders/${orderId}/items/${itemId}`, { method: "PUT", headers: { "Content-Type": "application/json" }, credentials: "include", body: JSON.stringify({ status: "done" }) });
       if (res.status === 401) { handleUnauthorized(); return; }
       if (res.ok && selectedTableId) fetchOrders(selectedTableId);
     } finally { setActionLoading(null); }
@@ -320,24 +422,26 @@ export default function ServerPage() {
   async function markItemCancelled(orderId: string, itemId: string) {
     setActionLoading(`item-cancel-${itemId}`);
     try {
-      const res = await fetch(`/api/server/orders/${orderId}/items/${itemId}`, {
-        method: "PUT", headers: { "Content-Type": "application/json" },
-        credentials: "include", body: JSON.stringify({ status: "cancelled" }),
-      });
+      const res = await fetch(`/api/server/orders/${orderId}/items/${itemId}`, { method: "PUT", headers: { "Content-Type": "application/json" }, credentials: "include", body: JSON.stringify({ status: "cancelled" }) });
       if (res.status === 401) { handleUnauthorized(); return; }
       if (res.ok && selectedTableId) fetchOrders(selectedTableId);
     } finally { setActionLoading(null); }
   }
 
   async function processPayment(sessionId: string) {
+    const tableSnapshot = selectedTable;
+    const ordersSnapshot = [...orders];
     setActionLoading(`payment-${sessionId}`);
     try {
-      const res = await fetch(`/api/server/sessions/${sessionId}`, {
-        method: "PUT", headers: { "Content-Type": "application/json" },
-        credentials: "include", body: JSON.stringify({ status: "paid" }),
-      });
+      const res = await fetch(`/api/server/sessions/${sessionId}`, { method: "PUT", headers: { "Content-Type": "application/json" }, credentials: "include", body: JSON.stringify({ status: "paid" }) });
       if (res.status === 401) { handleUnauthorized(); return; }
-      if (res.ok) { await fetchTables(); setSelectedTableId(null); }
+      if (res.ok) {
+        await fetchTables();
+        setSelectedTableId(null);
+        // save snapshot so invoice can still be printed after session is cleared
+        setPaidData({ table: tableSnapshot!, orders: ordersSnapshot });
+        setShowInvoice(true);
+      }
     } finally { setActionLoading(null); }
   }
 
@@ -346,11 +450,23 @@ export default function ServerPage() {
     router.push("/server/login");
   }
 
-  // ---- Derived state ----
-
   const selectedTable = tables.find((t) => t.id === selectedTableId) ?? null;
 
-  // ---- Render ----
+  const panelProps = selectedTable ? {
+    table: selectedTable,
+    orders,
+    ordersLoading,
+    actionLoading,
+    collapsedOrders,
+    onClose: () => setSelectedTableId(null),
+    onShowInvoice: () => { setPaidData(null); setShowInvoice(true); },
+    onProcessPayment: processPayment,
+    onMarkOrderDone: markOrderDone,
+    onMarkOrderCancelled: markOrderCancelled,
+    onMarkItemDone: markItemDone,
+    onMarkItemCancelled: markItemCancelled,
+    onToggleCollapse: toggleCollapse,
+  } : null;
 
   return (
     <div className="flex flex-col h-screen bg-gray-100 overflow-hidden">
@@ -366,24 +482,19 @@ export default function ServerPage() {
         </Button>
       </header>
 
-      {/* Body: left = 4-col table grid, right = order detail panel */}
+      {/* Body */}
       <div className="flex flex-1 overflow-hidden print:hidden">
-
-        {/* Left — Table grid */}
-        <div className="flex-1 flex flex-col overflow-hidden border-r border-gray-200 bg-white">
+        {/* Table grid */}
+        <div className="flex-1 flex flex-col overflow-hidden md:border-r md:border-gray-200 bg-white">
           <div className="px-4 py-2 border-b border-gray-100 flex items-center justify-between bg-gray-50 shrink-0">
             <span className="text-sm font-semibold text-gray-700">Danh sách bàn</span>
-            <button
-              onClick={() => fetchTables()}
-              title="Làm mới"
-              className="text-gray-400 hover:text-orange-500 transition-colors p-1 rounded"
-            >
+            <button onClick={fetchTables} title="Làm mới" className="text-gray-400 hover:text-orange-500 transition-colors p-1 rounded">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
               </svg>
             </button>
           </div>
-          <div className="flex-1 overflow-y-auto p-4">
+          <div className="flex-1 overflow-y-auto p-3 sm:p-4">
             {loading ? (
               <div className="flex items-center justify-center h-32">
                 <span className="h-6 w-6 animate-spin rounded-full border-2 border-orange-500 border-t-transparent" />
@@ -391,26 +502,25 @@ export default function ServerPage() {
             ) : tables.length === 0 ? (
               <p className="text-center text-gray-400 text-sm mt-8">Không có bàn nào</p>
             ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+              <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-3">
                 {tables.map((table) => (
                   <button
                     key={table.id}
                     onClick={() => setSelectedTableId(table.id === selectedTableId ? null : table.id)}
                     className={[
-                      "relative text-left rounded-xl border-2 p-4 transition-all",
+                      "relative text-left rounded-xl border-2 p-3 sm:p-4 transition-all",
                       tableColorClass(table.status),
                       table.id === selectedTableId
                         ? "border-orange-400 ring-2 ring-orange-200 shadow-md"
                         : "hover:border-orange-300 hover:shadow-sm",
                     ].join(" ")}
                   >
-                    {/* Pending badge top-right */}
                     {table.activeSession && table.activeSession.pendingOrdersCount > 0 && (
                       <span className="absolute -top-2 -right-2 inline-flex items-center justify-center h-5 min-w-5 rounded-full bg-orange-500 text-white text-xs font-bold px-1 shadow">
                         {table.activeSession.pendingOrdersCount}
                       </span>
                     )}
-                    <p className="text-2xl font-bold text-gray-800 leading-none mb-2">
+                    <p className="text-xl sm:text-2xl font-bold text-gray-800 leading-none mb-1.5">
                       {table.number}
                     </p>
                     {table.name && table.name !== `Bàn ${table.number}` && (
@@ -418,7 +528,7 @@ export default function ServerPage() {
                     )}
                     <Badge status={table.status} />
                     {table.activeSession && (
-                      <p className="text-xs text-gray-400 mt-1.5 truncate">
+                      <p className="text-xs text-gray-400 mt-1 truncate hidden sm:block">
                         {formatDate(table.activeSession.startedAt)}
                       </p>
                     )}
@@ -429,170 +539,39 @@ export default function ServerPage() {
           </div>
         </div>
 
-        {/* Right — Order detail panel */}
-        <aside className="w-[400px] shrink-0 flex flex-col overflow-hidden bg-gray-50">
-          {!selectedTable ? (
+        {/* Desktop right panel */}
+        <aside className="hidden md:flex w-[400px] shrink-0 flex-col overflow-hidden bg-gray-50">
+          {!panelProps ? (
             <div className="flex flex-col items-center justify-center h-full text-gray-400 p-6">
               <span className="text-5xl mb-3">🍽️</span>
               <p className="text-base font-medium text-center">Chọn một bàn để xem đơn hàng</p>
             </div>
-          ) : selectedTable.status === "ready" ? (
-            <div className="flex flex-col items-center justify-center h-full text-gray-400 p-6">
-              <span className="text-5xl mb-3">✅</span>
-              <p className="text-base font-medium">Bàn {selectedTable.number} đang trống</p>
-            </div>
           ) : (
-            <>
-              {/* Panel header */}
-              <div className="px-4 py-3 bg-white border-b border-gray-200 shrink-0">
-                <div className="flex items-start justify-between gap-2">
-                  <div>
-                    <h2 className="font-bold text-gray-800">{selectedTable.name || `Bàn ${selectedTable.number}`}</h2>
-                    <div className="flex items-center gap-2 mt-0.5">
-                      <Badge status={selectedTable.status} />
-                      {selectedTable.activeSession && (
-                        <span className="text-xs text-gray-400">
-                          {formatDate(selectedTable.activeSession.startedAt)}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => setSelectedTableId(null)}
-                    className="text-gray-400 hover:text-gray-600 text-lg leading-none mt-0.5"
-                  >
-                    ✕
-                  </button>
-                </div>
-                <div className="flex gap-2 mt-3 flex-wrap">
-                  {orders.length > 0 && (
-                    <Button variant="secondary" size="sm" onClick={() => setShowInvoice(true)}>
-                      🧾 Preview hóa đơn
-                    </Button>
-                  )}
-                  {selectedTable.status === "payment_requested" && selectedTable.activeSession && (
-                    <Button
-                      variant="success"
-                      size="sm"
-                      loading={actionLoading === `payment-${selectedTable.activeSession.id}`}
-                      onClick={() => processPayment(selectedTable.activeSession!.id)}
-                    >
-                      ✅ Đã thanh toán
-                    </Button>
-                  )}
-                </div>
-              </div>
-
-              {/* Orders list */}
-              <div className="flex-1 overflow-y-auto p-3 space-y-3">
-                {ordersLoading ? (
-                  <div className="flex items-center justify-center h-32">
-                    <span className="h-6 w-6 animate-spin rounded-full border-2 border-orange-500 border-t-transparent" />
-                  </div>
-                ) : orders.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center py-12 text-gray-400 bg-white rounded-xl border border-gray-100">
-                    <span className="text-3xl mb-2">📋</span>
-                    <p className="text-sm font-medium">Chưa có đơn hàng nào</p>
-                  </div>
-                ) : (
-                  orders.map((order, idx) => {
-                    const isCollapsed = collapsedOrders.has(order.id);
-                    const orderTotal = order.items
-                      .filter((i) => i.status !== "cancelled")
-                      .reduce((s, i) => s + i.priceAtOrder * i.quantity, 0);
-                    return (
-                      <div key={order.id} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                        {/* Order header */}
-                        <div
-                          className="flex items-center justify-between gap-2 px-3 py-2.5 bg-gray-50 border-b border-gray-100 cursor-pointer select-none hover:bg-gray-100 transition-colors"
-                          onClick={() => toggleCollapse(order.id)}
-                        >
-                          <div className="flex items-center gap-1.5 flex-wrap min-w-0">
-                            <span className={`text-gray-400 text-xs transition-transform ${isCollapsed ? "-rotate-90" : ""}`}>▼</span>
-                            <span className="text-xs font-semibold text-gray-700">#{idx + 1}</span>
-                            <Badge status={order.status} />
-                            <span className="text-xs text-gray-400 truncate">{formatDate(order.calledAt)}</span>
-                          </div>
-                          <div className="flex items-center gap-2 shrink-0">
-                            <span className="text-xs font-medium text-gray-600">{formatPrice(orderTotal)}</span>
-                            {order.status === "pending" && (
-                              <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
-                                <Button
-                                  variant="success"
-                                  size="sm"
-                                  loading={actionLoading === `order-done-${order.id}`}
-                                  onClick={() => markOrderDone(order.id)}
-                                >
-                                  ✓ Done
-                                </Button>
-                                <Button
-                                  variant="danger"
-                                  size="sm"
-                                  loading={actionLoading === `order-cancel-${order.id}`}
-                                  onClick={() => markOrderCancelled(order.id)}
-                                >
-                                  Hủy
-                                </Button>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-
-                        {/* Items */}
-                        {!isCollapsed && (
-                          <ul className="divide-y divide-gray-50">
-                            {order.items.map((item) => (
-                              <li key={item.id} className="px-3 py-2.5 flex items-center gap-2">
-                                <div className="flex-1 min-w-0">
-                                  <div className="flex items-center gap-1.5 flex-wrap">
-                                    <span className="text-sm font-medium text-gray-800 truncate">{item.menuItem.name}</span>
-                                    <span className="text-gray-400 text-xs">×{item.quantity}</span>
-                                    <Badge status={item.status} />
-                                  </div>
-                                  <p className="text-xs text-gray-400 mt-0.5">
-                                    {formatPrice(item.priceAtOrder * item.quantity)}
-                                  </p>
-                                </div>
-                                {item.status === "pending" && (
-                                  <div className="flex gap-1 shrink-0">
-                                    <Button
-                                      variant="success"
-                                      size="sm"
-                                      loading={actionLoading === `item-done-${item.id}`}
-                                      onClick={() => markItemDone(order.id, item.id)}
-                                    >
-                                      ✓
-                                    </Button>
-                                    <Button
-                                      variant="danger"
-                                      size="sm"
-                                      loading={actionLoading === `item-cancel-${item.id}`}
-                                      onClick={() => markItemCancelled(order.id, item.id)}
-                                    >
-                                      ✕
-                                    </Button>
-                                  </div>
-                                )}
-                              </li>
-                            ))}
-                          </ul>
-                        )}
-                      </div>
-                    );
-                  })
-                )}
-              </div>
-            </>
+            <OrderPanel {...panelProps} />
           )}
         </aside>
       </div>
 
+      {/* Mobile bottom sheet */}
+      {selectedTable && panelProps && (
+        <div className="md:hidden fixed inset-0 z-40 print:hidden">
+          <div className="absolute inset-0 bg-black/40" onClick={() => setSelectedTableId(null)} />
+          <div className="absolute bottom-0 left-0 right-0 bg-gray-50 rounded-t-2xl shadow-2xl flex flex-col max-h-[85vh]">
+            {/* Drag handle */}
+            <div className="flex justify-center pt-3 pb-1 shrink-0">
+              <div className="w-10 h-1 bg-gray-300 rounded-full" />
+            </div>
+            <OrderPanel {...panelProps} />
+          </div>
+        </div>
+      )}
+
       {/* Invoice modal */}
-      {showInvoice && selectedTable && (
+      {showInvoice && (paidData || selectedTable) && (
         <InvoiceModal
-          table={selectedTable}
-          orders={orders}
-          onClose={() => setShowInvoice(false)}
+          table={paidData?.table ?? selectedTable!}
+          orders={paidData?.orders ?? orders}
+          onClose={() => { setShowInvoice(false); setPaidData(null); }}
         />
       )}
     </div>

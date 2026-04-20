@@ -1,0 +1,236 @@
+{
+  "tables": [
+    {
+      "number": 1,
+      "name": "Bàn 1",
+      "password": "table1",
+      "status": "occupied",
+      "qrToken": "cmo74ddel0001egdl71qmwj57"
+    },
+    {
+      "number": 2,
+      "name": "Bàn 2",
+      "password": "table2",
+      "status": "ready",
+      "qrToken": "cmo74dden0003egdlgq7f4a7y"
+    },
+    {
+      "number": 3,
+      "name": "Bàn 3",
+      "password": "table3",
+      "status": "ready",
+      "qrToken": "cmo74dden0005egdlei5gi5vs"
+    },
+    {
+      "number": 4,
+      "name": "Bàn 4",
+      "password": "table4",
+      "status": "ready",
+      "qrToken": "cmo74ddeo0007egdlozs3g759"
+    },
+    {
+      "number": 5,
+      "name": "Bàn 5",
+      "password": "table5",
+      "status": "ready",
+      "qrToken": "cmo74ddep0009egdl07oibvcu"
+    },
+    {
+      "number": 6,
+      "name": "Bàn 6",
+      "password": "table6",
+      "status": "ready",
+      "qrToken": "cmo74ddep000begdldt07nu36"
+    },
+    {
+      "number": 7,
+      "name": "Bàn 7",
+      "password": "table7",
+      "status": "ready",
+      "qrToken": "cmo74ddeq000degdlqmqk79s3"
+    },
+    {
+      "number": 8,
+      "name": "Bàn 8",
+      "password": "table8",
+      "status": "ready",
+      "qrToken": "cmo74ddeq000fegdltx0ocqbd"
+    },
+    {
+      "number": 9,
+      "name": "Bàn 9",
+      "password": "table9",
+      "status": "ready",
+      "qrToken": "cmo74dder000hegdl50zz8c7o"
+    },
+    {
+      "number": 10,
+      "name": "Bàn 10",
+      "password": "table10",
+      "status": "ready",
+      "qrToken": "cmo74ddes000jegdlkze64fzo"
+    }
+  ],
+  "menuItems": [
+    {
+      "name": "Trà đá",
+      "description": "Trà đá mát lạnh",
+      "price": 10000,
+      "category": "Đồ uống",
+      "available": true,
+      "imageUrl": "https://images.unsplash.com/photo-1544145945-f90425340c7e?w=400&h=300&fit=crop"
+    },
+    {
+      "name": "Nước ngọt Coca Cola",
+      "description": "Coca Cola lon 330ml",
+      "price": 20000,
+      "category": "Đồ uống",
+      "available": true,
+      "imageUrl": "https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=400&h=300&fit=crop"
+    },
+    {
+      "name": "Nước cam ép",
+      "description": "Cam ép tươi nguyên chất",
+      "price": 35000,
+      "category": "Đồ uống",
+      "available": true,
+      "imageUrl": "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400&h=300&fit=crop"
+    },
+    {
+      "name": "Cà phê đen",
+      "description": "Cà phê phin truyền thống",
+      "price": 25000,
+      "category": "Đồ uống",
+      "available": true,
+      "imageUrl": "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=400&h=300&fit=crop"
+    },
+    {
+      "name": "Sinh tố bơ",
+      "description": "Sinh tố bơ béo ngậy",
+      "price": 45000,
+      "category": "Đồ uống",
+      "available": true,
+      "imageUrl": "https://images.unsplash.com/photo-1437418747212-8d9709afab22?w=400&h=300&fit=crop"
+    },
+    {
+      "name": "Gỏi cuốn tôm thịt",
+      "description": "Gỏi cuốn tươi với tôm và thịt heo, chấm tương hoisin",
+      "price": 55000,
+      "category": "Khai vị",
+      "available": true,
+      "imageUrl": "https://images.unsplash.com/photo-1541014741259-de529411b96a?w=400&h=300&fit=crop"
+    },
+    {
+      "name": "Chả giò chiên",
+      "description": "Chả giò giòn rụm nhân thịt và rau củ",
+      "price": 65000,
+      "category": "Khai vị",
+      "available": true,
+      "imageUrl": "https://images.unsplash.com/photo-1498654896293-37aacf113fd9?w=400&h=300&fit=crop"
+    },
+    {
+      "name": "Salad rau trộn",
+      "description": "Salad rau tươi trộn dầu mè",
+      "price": 50000,
+      "category": "Khai vị",
+      "available": true,
+      "imageUrl": "https://images.unsplash.com/photo-1626082927389-6cd097cee6a7?w=400&h=300&fit=crop"
+    },
+    {
+      "name": "Súp bí đỏ",
+      "description": "Súp bí đỏ kem mịn béo",
+      "price": 45000,
+      "category": "Khai vị",
+      "available": true,
+      "imageUrl": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&h=300&fit=crop"
+    },
+    {
+      "name": "Cơm sườn nướng",
+      "description": "Cơm trắng với sườn heo nướng thơm, dưa leo, cà chua",
+      "price": 85000,
+      "category": "Món chính",
+      "available": true,
+      "imageUrl": "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&h=300&fit=crop"
+    },
+    {
+      "name": "Phở bò tái",
+      "description": "Phở bò tái hành tươi, nước dùng trong",
+      "price": 75000,
+      "category": "Món chính",
+      "available": true,
+      "imageUrl": "https://images.unsplash.com/photo-1563379926898-05f4575a45d8?w=400&h=300&fit=crop"
+    },
+    {
+      "name": "Bún bò Huế",
+      "description": "Bún bò Huế cay nồng đặc trưng",
+      "price": 70000,
+      "category": "Món chính",
+      "available": true,
+      "imageUrl": "https://images.unsplash.com/photo-1547592180-85f173990554?w=400&h=300&fit=crop"
+    },
+    {
+      "name": "Cá kho tộ",
+      "description": "Cá catfish kho tộ đậm đà, ăn kèm cơm trắng",
+      "price": 95000,
+      "category": "Món chính",
+      "available": true,
+      "imageUrl": "https://images.unsplash.com/photo-1574484284002-952d92456975?w=400&h=300&fit=crop"
+    },
+    {
+      "name": "Lẩu thập cẩm (2 người)",
+      "description": "Lẩu hải sản thập cẩm cho 2 người",
+      "price": 250000,
+      "category": "Món chính",
+      "available": true,
+      "imageUrl": "https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?w=400&h=300&fit=crop"
+    },
+    {
+      "name": "Cơm chiên dương châu",
+      "description": "Cơm chiên trứng với tôm, xá xíu và rau củ",
+      "price": 65000,
+      "category": "Món chính",
+      "available": true,
+      "imageUrl": "https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=400&h=300&fit=crop"
+    },
+    {
+      "name": "Mì xào hải sản",
+      "description": "Mì xào giòn với tôm, mực và sốt hải sản",
+      "price": 90000,
+      "category": "Món chính",
+      "available": true,
+      "imageUrl": "https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?w=400&h=300&fit=crop"
+    },
+    {
+      "name": "Chè đậu xanh",
+      "description": "Chè đậu xanh nước dừa mát lạnh",
+      "price": 30000,
+      "category": "Tráng miệng",
+      "available": true,
+      "imageUrl": "https://images.unsplash.com/photo-1551024601-bec78aea704b?w=400&h=300&fit=crop"
+    },
+    {
+      "name": "Kem ba màu",
+      "description": "Kem ly ba màu đặc trưng Việt Nam",
+      "price": 35000,
+      "category": "Tráng miệng",
+      "available": true,
+      "imageUrl": "https://images.unsplash.com/photo-1488477181946-6428a0291777?w=400&h=300&fit=crop"
+    },
+    {
+      "name": "Bánh flan caramel",
+      "description": "Bánh flan mềm mịn với lớp caramel ngọt",
+      "price": 40000,
+      "category": "Tráng miệng",
+      "available": true,
+      "imageUrl": "https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=400&h=300&fit=crop"
+    },
+    {
+      "name": "Trái cây theo mùa",
+      "description": "Đĩa trái cây tươi theo mùa",
+      "price": 55000,
+      "category": "Tráng miệng",
+      "available": true,
+      "imageUrl": "https://images.unsplash.com/photo-1576618148400-f54bed99fcfd?w=400&h=300&fit=crop"
+    }
+  ]
+}
