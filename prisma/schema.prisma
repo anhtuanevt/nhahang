@@ -1,0 +1,81 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Table {
+  id       String  @id @default(cuid())
+  number   Int     @unique
+  name     String?
+  password String
+  qrToken  String  @unique @default(cuid())
+  status   String  @default("ready")
+  sessions Session[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model MenuItem {
+  id          String      @id @default(cuid())
+  name        String
+  description String?
+  price       Float
+  category    String      @default("Khác")
+  imageUrl    String?
+  available   Boolean     @default(true)
+  orderItems  OrderItem[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+model Session {
+  id           String    @id @default(cuid())
+  tableId      String
+  table        Table     @relation(fields: [tableId], references: [id])
+  sessionToken String    @unique @default(cuid())
+  status       String    @default("active")
+  orders       Order[]
+  startedAt    DateTime  @default(now())
+  endedAt      DateTime?
+}
+
+model Order {
+  id        String      @id @default(cuid())
+  sessionId String
+  session   Session     @relation(fields: [sessionId], references: [id])
+  tableId   String
+  status    String      @default("pending")
+  items     OrderItem[]
+  calledAt  DateTime    @default(now())
+}
+
+model OrderItem {
+  id           String   @id @default(cuid())
+  orderId      String
+  order        Order    @relation(fields: [orderId], references: [id])
+  menuItemId   String
+  menuItem     MenuItem @relation(fields: [menuItemId], references: [id])
+  quantity     Int
+  priceAtOrder Float
+  status       String   @default("pending")
+}
+
+model Setting {
+  key   String @id
+  value String
+}
+
+model Feedback {
+  id         String   @id @default(cuid())
+  tableId    String
+  tableNumber Int
+  sessionId  String?
+  rating     Int
+  comment    String?
+  status     String   @default("unread")
+  createdAt  DateTime @default(now())
+}
