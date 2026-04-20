@@ -50,6 +50,7 @@ function TablePageInner() {
   const [password, setPassword] = useState("");
   const [authError, setAuthError] = useState("");
   const [authLoading, setAuthLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   // App state
   const [activeTab, setActiveTab] = useState<"menu" | "orders" | "feedback">("menu");
@@ -332,20 +333,29 @@ function TablePageInner() {
                   <label className="block text-sm font-semibold text-gray-700 mb-1.5">
                     Mật khẩu bàn
                   </label>
-                  <input
-                    type="password"
-                    value={password}
-                    onChange={(e) => { setPassword(e.target.value); setAuthError(""); }}
-                    placeholder="Nhập mật khẩu..."
-                    className={cn(
-                      "block w-full rounded-xl border-2 px-4 py-3 text-sm placeholder-gray-400 focus:outline-none transition-colors",
-                      authError
-                        ? "border-red-300 focus:border-red-500"
-                        : "border-gray-200 focus:border-orange-400"
-                    )}
-                    autoFocus
-                    autoComplete="current-password"
-                  />
+                  <div className="relative">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      value={password}
+                      onChange={(e) => { setPassword(e.target.value); setAuthError(""); }}
+                      placeholder="Nhập mật khẩu..."
+                      className={cn(
+                        "block w-full rounded-xl border-2 px-4 py-3 pr-10 text-sm placeholder-gray-400 focus:outline-none transition-colors",
+                        authError
+                          ? "border-red-300 focus:border-red-500"
+                          : "border-gray-200 focus:border-orange-400"
+                      )}
+                      autoFocus
+                      autoComplete="current-password"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    >
+                      {showPassword ? "🙈" : "👁️"}
+                    </button>
+                  </div>
                   {authError && (
                     <p className="mt-1.5 text-xs text-red-600 flex items-center gap-1">
                       <span>⚠️</span> {authError}
