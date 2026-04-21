@@ -49,6 +49,20 @@ interface Order {
   items: OrderItem[];
 }
 
+interface HistoryOrderItem {
+  id: string; quantity: number; priceAtOrder: number;
+  menuItem: { name: string };
+}
+interface HistoryOrder {
+  id: string; status: string; calledAt: string;
+  items: HistoryOrderItem[];
+}
+interface HistorySession {
+  id: string; status: string; startedAt: string; endedAt: string | null;
+  table: { number: number; name: string | null };
+  orders: HistoryOrder[];
+}
+
 // ---- Helpers ----
 
 function tableColorClass(status: Table["status"]): string {
@@ -327,6 +341,7 @@ function OrderPanel({
 export default function ServerPage() {
   const router = useRouter();
 
+  const [activeView, setActiveView] = useState<"tables" | "history">("tables");
   const [tables, setTables] = useState<Table[]>([]);
   const [selectedTableId, setSelectedTableId] = useState<string | null>(null);
   const [orders, setOrders] = useState<Order[]>([]);
@@ -335,8 +350,10 @@ export default function ServerPage() {
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [collapsedOrders, setCollapsedOrders] = useState<Set<string>>(new Set());
   const [showInvoice, setShowInvoice] = useState(false);
-  // holds table+orders snapshot after payment so invoice can still be printed
   const [paidData, setPaidData] = useState<{ table: Table; orders: Order[] } | null>(null);
+  const [history, setHistory] = useState<HistorySession[]>([]);
+  const [historyLoading, setHistoryLoading] = useState(false);
+  const [expandedHistory, setExpandedHistory] = useState<Set<string>>(new Set());
   const sseRef = useRef<EventSource | null>(null);
 
   const handleUnauthorized = useCallback(() => router.push("/server/login"), [router]);
@@ -357,6 +374,19 @@ export default function ServerPage() {
       if (res.ok) setOrders(await res.json());
     } catch { /* ignore */ } finally { setOrdersLoading(false); }
   }, [handleUnauthorized]);
+
+  const fetchHistory = useCallback(async () => {
+    setHistoryLoading(true);
+    try {
+      const res = await fetch("/api/server/history", { credentials: "include" });
+      if (res.status === 401) { handleUnauthorized(); return; }
+      if (res.ok) setHistory(await res.json());
+    } catch { /* ignore */ } finally { setHistoryLoading(false); }
+  }, [handleUnauthorized]);
+
+  useEffect(() => {
+    if (activeView === "history") fetchHistory();
+  }, [activeView, fetchHistory]);
 
   useEffect(() => {
     fetchTables();
@@ -472,18 +502,101 @@ export default function ServerPage() {
     <div className="flex flex-col h-screen bg-gray-100 overflow-hidden">
       {/* Header */}
       <header className="bg-gray-900 text-white px-4 py-3 flex items-center justify-between shrink-0 shadow-lg print:hidden">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           <span className="text-xl">🍜</span>
-          <span className="font-semibold text-lg">Màn hình phục vụ</span>
-          <span className="text-gray-400 hidden sm:inline">| Nhà Hàng</span>
+          <span className="font-semibold text-lg hidden sm:inline">Màn hình phục vụ</span>
+          {/* Tab switcher */}
+          <div className="flex bg-gray-700 rounded-lg p-0.5 gap-0.5">
+            <button
+              onClick={() => setActiveView("tables")}
+              className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${activeView === "tables" ? "bg-white text-gray-900" : "text-gray-300 hover:text-white"}`}
+            >
+              🪑 Bàn
+            </button>
+            <button
+              onClick={() => setActiveView("history")}
+              className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${activeView === "history" ? "bg-white text-gray-900" : "text-gray-300 hover:text-white"}`}
+            >
+              📋 Lịch sử
+            </button>
+          </div>
         </div>
         <Button variant="ghost" size="sm" onClick={handleLogout} className="text-gray-300 hover:text-white hover:bg-gray-700">
           Đăng xuất
         </Button>
       </header>
 
+      {/* History view */}
+      {activeView === "history" && (
+        <div className="flex-1 overflow-y-auto bg-white print:hidden">
+          <div className="flex items-center justify-between px-4 py-2 border-b border-gray-100 bg-gray-50 sticky top-0">
+            <span className="text-sm font-semibold text-gray-700">Lịch sử hôm nay</span>
+            <button onClick={fetchHistory} className="text-gray-400 hover:text-orange-500 transition-colors p-1 rounded">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+            </button>
+          </div>
+          {historyLoading ? (
+            <div className="flex justify-center py-16">
+              <span className="h-7 w-7 animate-spin rounded-full border-2 border-orange-500 border-t-transparent" />
+            </div>
+          ) : history.length === 0 ? (
+            <div className="text-center py-16 text-gray-400">
+              <span className="text-4xl block mb-2">📋</span>
+              <p className="text-sm">Chưa có phiên nào hôm nay</p>
+            </div>
+          ) : (
+            <div className="p-3 space-y-2">
+              {history.map((session) => {
+                const total = session.orders.flatMap((o) => o.items).reduce((s, i) => s + i.priceAtOrder * i.quantity, 0);
+                const itemCount = session.orders.flatMap((o) => o.items).reduce((s, i) => s + i.quantity, 0);
+                const expanded = expandedHistory.has(session.id);
+                return (
+                  <div key={session.id} className="border border-gray-100 rounded-xl overflow-hidden">
+                    <button
+                      className="w-full text-left px-4 py-3 flex items-center justify-between gap-2 hover:bg-gray-50 transition-colors"
+                      onClick={() => setExpandedHistory((prev) => { const n = new Set(prev); n.has(session.id) ? n.delete(session.id) : n.add(session.id); return n; })}
+                    >
+                      <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 min-w-0">
+                        <span className="font-semibold text-gray-800">Bàn {session.table.number}</span>
+                        <span className="text-xs text-gray-400">{formatDate(session.startedAt)}</span>
+                        <span className="text-xs text-gray-500">{itemCount} món</span>
+                        <span className="text-sm font-semibold text-orange-600">{formatPrice(total)}</span>
+                      </div>
+                      <span className="text-gray-400 text-xs shrink-0">{expanded ? "▲" : "▼"}</span>
+                    </button>
+                    {expanded && (
+                      <div className="border-t border-gray-100 px-4 py-3 space-y-3 bg-gray-50">
+                        {session.orders.map((order, idx) => (
+                          <div key={order.id}>
+                            <p className="text-xs text-gray-400 mb-1.5">Đơn #{idx + 1} — {formatDate(order.calledAt)}</p>
+                            <div className="space-y-1">
+                              {order.items.map((item) => (
+                                <div key={item.id} className="flex items-center justify-between text-sm">
+                                  <span className="text-gray-700">{item.menuItem.name} <span className="text-gray-400">×{item.quantity}</span></span>
+                                  <span className="text-gray-600">{formatPrice(item.priceAtOrder * item.quantity)}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                        <div className="border-t border-gray-200 pt-2 flex justify-between text-sm font-bold">
+                          <span className="text-gray-700">Tổng phiên</span>
+                          <span className="text-orange-600">{formatPrice(total)}</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Body */}
-      <div className="flex flex-1 overflow-hidden print:hidden">
+      <div className={`flex flex-1 overflow-hidden print:hidden ${activeView !== "tables" ? "hidden" : ""}`}>
         {/* Table grid */}
         <div className="flex-1 flex flex-col overflow-hidden md:border-r md:border-gray-200 bg-white">
           <div className="px-4 py-2 border-b border-gray-100 flex items-center justify-between bg-gray-50 shrink-0">
