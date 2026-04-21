@@ -16,7 +16,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/admin/tables")
+    fetch("/api/public/tables")
       .then((res) => res.json())
       .then((data) => {
         setTables(data);
