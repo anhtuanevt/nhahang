@@ -79,3 +79,15 @@ model Feedback {
   status     String   @default("unread")
   createdAt  DateTime @default(now())
 }
+
+model Reservation {
+  id        String   @id @default(cuid())
+  name      String
+  phone     String
+  date      String
+  time      String
+  guests    Int
+  note      String?
+  status    String   @default("pending")
+  createdAt DateTime @default(now())
+}
