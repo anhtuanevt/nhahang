@@ -60,13 +60,13 @@ export default function ReportPage() {
   return (
     <div className="p-4 sm:p-6 lg:p-8 space-y-6">
       {/* Header */}
-      <div className="flex items-start justify-between flex-wrap gap-4">
+      <div className="flex flex-col gap-3">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Báo cáo & Thống kê</h1>
           <p className="text-sm text-gray-500 mt-1">Phân tích doanh thu và lượng khách</p>
         </div>
         {/* Filters */}
-        <div className="flex items-center gap-2 flex-wrap">
+        <div className="flex flex-wrap gap-2">
           {PRESETS.map((p) => (
             <button
               key={p.days}
@@ -76,7 +76,7 @@ export default function ReportPage() {
               {p.label}
             </button>
           ))}
-          <div className="flex items-center gap-1.5 ml-2">
+          <div className="flex items-center gap-1.5 flex-wrap">
             <input type="date" value={from} onChange={(e) => setFrom(e.target.value)}
               className="rounded-lg border border-gray-300 px-2 py-1.5 text-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500" />
             <span className="text-gray-400 text-sm">→</span>
