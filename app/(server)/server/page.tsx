@@ -354,6 +354,7 @@ export default function ServerPage() {
   const [history, setHistory] = useState<HistorySession[]>([]);
   const [historyLoading, setHistoryLoading] = useState(false);
   const [expandedHistory, setExpandedHistory] = useState<Set<string>>(new Set());
+  const [reprintSession, setReprintSession] = useState<HistorySession | null>(null);
   const sseRef = useRef<EventSource | null>(null);
 
   const handleUnauthorized = useCallback(() => router.push("/server/login"), [router]);
@@ -564,7 +565,16 @@ export default function ServerPage() {
                         <span className="text-xs text-gray-500">{itemCount} món</span>
                         <span className="text-sm font-semibold text-orange-600">{formatPrice(total)}</span>
                       </div>
-                      <span className="text-gray-400 text-xs shrink-0">{expanded ? "▲" : "▼"}</span>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <button
+                          onClick={(e) => { e.stopPropagation(); setReprintSession(session); }}
+                          className="p-1.5 text-gray-400 hover:text-orange-500 hover:bg-orange-50 rounded-lg transition-colors"
+                          title="In lại hóa đơn"
+                        >
+                          🖨️
+                        </button>
+                        <span className="text-gray-400 text-xs">{expanded ? "▲" : "▼"}</span>
+                      </div>
                     </button>
                     {expanded && (
                       <div className="border-t border-gray-100 px-4 py-3 space-y-3 bg-gray-50">
@@ -682,6 +692,20 @@ export default function ServerPage() {
             <OrderPanel {...panelProps} />
           </div>
         </div>
+      )}
+
+      {/* Reprint invoice from history */}
+      {reprintSession && (
+        <InvoiceModal
+          table={{
+            id: "", number: reprintSession.table.number,
+            name: reprintSession.table.name ?? "",
+            status: "ready", qrToken: "",
+            activeSession: { id: "", startedAt: reprintSession.startedAt, pendingOrdersCount: 0 },
+          }}
+          orders={reprintSession.orders as unknown as Order[]}
+          onClose={() => setReprintSession(null)}
+        />
       )}
 
       {/* Invoice modal */}
