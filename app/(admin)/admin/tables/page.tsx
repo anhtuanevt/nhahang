@@ -35,6 +35,8 @@ export default function TablesPage() {
   const [formError, setFormError] = useState("");
 
   const [qrTable, setQrTable] = useState<Table | null>(null);
+  const [qrCacheBust, setQrCacheBust] = useState(0);
+  const [regenerating, setRegenerating] = useState(false);
   const [showPassId, setShowPassId] = useState<string | null>(null);
 
   async function fetchTables() {
@@ -263,20 +265,47 @@ export default function TablesPage() {
         {qrTable && (
           <div className="flex flex-col items-center gap-4">
             <img
-              src={`/api/admin/tables/${qrTable.id}/qr`}
+              src={`/api/admin/tables/${qrTable.id}/qr?v=${qrCacheBust}`}
               alt={`QR Code bàn ${qrTable.number}`}
               className="w-56 h-56 border border-gray-200 rounded-lg object-contain"
             />
+            <p className="text-xs text-gray-400 text-center break-all px-2">
+              Link: <span className="font-mono text-gray-600">/table/{qrTable.number}?qr=***</span>
+            </p>
             <p className="text-sm text-gray-500 text-center">
               Khách hàng quét mã này để vào thực đơn của bàn {qrTable.number}
             </p>
-            <a
-              href={`/api/admin/tables/${qrTable.id}/qr`}
-              download={`qr-ban-${qrTable.number}.png`}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-orange-500 text-white rounded-lg text-sm font-medium hover:bg-orange-600 transition-colors"
-            >
-              Tải xuống QR
-            </a>
+            <div className="flex gap-2 w-full">
+              <a
+                href={`/api/admin/tables/${qrTable.id}/qr?v=${qrCacheBust}`}
+                download={`qr-ban-${qrTable.number}.png`}
+                className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 bg-orange-500 text-white rounded-lg text-sm font-medium hover:bg-orange-600 transition-colors"
+              >
+                Tải xuống
+              </a>
+              <button
+                onClick={async () => {
+                  if (!confirm("Đổi QR sẽ làm mã cũ hết hiệu lực. Tiếp tục?")) return;
+                  setRegenerating(true);
+                  try {
+                    const res = await fetch(`/api/admin/tables/${qrTable.id}/qr`, {
+                      method: "POST",
+                      credentials: "include",
+                    });
+                    if (res.ok) {
+                      setQrCacheBust((v) => v + 1);
+                      await fetchTables();
+                    }
+                  } finally {
+                    setRegenerating(false);
+                  }
+                }}
+                disabled={regenerating}
+                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors disabled:opacity-50"
+              >
+                {regenerating ? "Đang đổi..." : "Đổi QR mới"}
+              </button>
+            </div>
           </div>
         )}
       </Modal>
