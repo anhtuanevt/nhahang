@@ -233,9 +233,9 @@ function OrderPanel({
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-lg leading-none mt-0.5">✕</button>
         </div>
         <div className="flex gap-2 mt-3 flex-wrap">
-          {orders.length > 0 && (
+          {(orders.length > 0 || table.status === "payment_requested") && (
             <Button variant="secondary" size="sm" onClick={onShowInvoice}>
-              🧾 Preview hóa đơn
+              🧾 In hóa đơn
             </Button>
           )}
           {table.status === "payment_requested" && table.activeSession && (
@@ -515,7 +515,12 @@ export default function ServerPage() {
                         : "hover:border-orange-300 hover:shadow-sm",
                     ].join(" ")}
                   >
-                    {table.activeSession && table.activeSession.pendingOrdersCount > 0 && (
+                    {table.status === "payment_requested" && (
+                      <span className="absolute -top-2 -right-2 inline-flex items-center justify-center h-5 rounded-full bg-green-500 text-white text-xs font-bold px-1.5 shadow whitespace-nowrap">
+                        💳
+                      </span>
+                    )}
+                    {table.status !== "payment_requested" && table.activeSession && table.activeSession.pendingOrdersCount > 0 && (
                       <span className="absolute -top-2 -right-2 inline-flex items-center justify-center h-5 min-w-5 rounded-full bg-orange-500 text-white text-xs font-bold px-1 shadow">
                         {table.activeSession.pendingOrdersCount}
                       </span>
