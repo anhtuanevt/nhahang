@@ -113,25 +113,55 @@ export default function ReportPage() {
             {data.dailyRevenue.length === 0 ? (
               <p className="text-gray-400 text-sm text-center py-8">Không có dữ liệu</p>
             ) : (
-              <div className="overflow-x-auto">
-                <div className="flex items-end gap-1 h-40 min-w-0" style={{ minWidth: `${data.dailyRevenue.length * 32}px` }}>
-                  {data.dailyRevenue.map((d) => {
-                    const pct = maxRevenue > 0 ? (d.revenue / maxRevenue) * 100 : 0;
-                    return (
-                      <div key={d.date} className="flex-1 flex flex-col items-center gap-1 group min-w-[28px]">
-                        <div className="relative w-full flex items-end justify-center" style={{ height: "120px" }}>
+              <div className="overflow-x-auto pb-2">
+                <div style={{ minWidth: `${Math.max(data.dailyRevenue.length * 36, 300)}px` }}>
+                  {/* Bars */}
+                  <div className="flex items-end gap-[3px]" style={{ height: 140 }}>
+                    {data.dailyRevenue.map((d) => {
+                      const pct = maxRevenue > 0 ? (d.revenue / maxRevenue) * 100 : 0;
+                      const hasRevenue = d.revenue > 0;
+                      return (
+                        <div
+                          key={d.date}
+                          className="flex-1 flex flex-col items-center justify-end group relative min-w-[28px]"
+                          style={{ height: "100%" }}
+                        >
+                          {/* Tooltip */}
+                          {hasRevenue && (
+                            <div className="absolute bottom-full mb-1 left-1/2 -translate-x-1/2 hidden group-hover:flex flex-col items-center z-10 pointer-events-none">
+                              <div className="bg-gray-800 text-white text-xs rounded-lg px-2 py-1.5 whitespace-nowrap shadow-lg">
+                                <div className="font-semibold">{formatPrice(d.revenue)}</div>
+                                <div className="text-gray-300">{d.sessions} lượt</div>
+                              </div>
+                              <div className="w-2 h-2 bg-gray-800 rotate-45 -mt-1" />
+                            </div>
+                          )}
                           <div
-                            className="w-full bg-orange-400 hover:bg-orange-500 rounded-t transition-colors cursor-default"
-                            style={{ height: `${Math.max(pct, 2)}%` }}
-                            title={`${d.date}: ${formatPrice(d.revenue)} (${d.sessions} khách)`}
+                            className={`w-full rounded-t-md transition-colors ${hasRevenue ? "bg-orange-400 hover:bg-orange-500 cursor-pointer" : "bg-gray-100"}`}
+                            style={{ height: `${Math.max(pct, hasRevenue ? 3 : 1)}%` }}
                           />
                         </div>
-                        <span className="text-xs text-gray-400 rotate-45 origin-left whitespace-nowrap" style={{ fontSize: "10px" }}>
-                          {formatShortDate(d.date)}
-                        </span>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
+                  </div>
+                  {/* X-axis labels */}
+                  <div className="flex gap-[3px] mt-2">
+                    {data.dailyRevenue.map((d, i) => {
+                      const total = data.dailyRevenue.length;
+                      // Show label every N days to avoid crowding
+                      const step = total <= 10 ? 1 : total <= 20 ? 2 : total <= 31 ? 3 : 7;
+                      const show = i % step === 0 || i === total - 1;
+                      return (
+                        <div key={d.date} className="flex-1 min-w-[28px] text-center">
+                          {show && (
+                            <span className="text-gray-400 block" style={{ fontSize: 9 }}>
+                              {formatShortDate(d.date)}
+                            </span>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
             )}

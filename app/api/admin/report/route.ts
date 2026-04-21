@@ -37,9 +37,15 @@ export async function GET(req: NextRequest) {
       const existing = dailyMap.get(day) ?? { revenue: 0, sessions: 0 };
       dailyMap.set(day, { revenue: existing.revenue + rev, sessions: existing.sessions + 1 });
     }
-    const dailyRevenue = Array.from(dailyMap.entries())
-      .map(([date, v]) => ({ date, ...v }))
-      .sort((a, b) => a.date.localeCompare(b.date));
+    // Fill every day in range, even days with no revenue
+    const dailyRevenue: { date: string; revenue: number; sessions: number }[] = [];
+    const cursor = new Date(fromDate);
+    while (cursor <= toDate) {
+      const day = cursor.toISOString().slice(0, 10);
+      const v = dailyMap.get(day) ?? { revenue: 0, sessions: 0 };
+      dailyRevenue.push({ date: day, ...v });
+      cursor.setDate(cursor.getDate() + 1);
+    }
 
     // --- Top items ---
     const itemMap = new Map<string, { name: string; totalQuantity: number; totalRevenue: number }>();
