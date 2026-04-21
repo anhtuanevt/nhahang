@@ -71,7 +71,7 @@ export default function ReportPage() {
             <button
               key={p.days}
               onClick={() => applyPreset(p.days)}
-              className="px-3 py-1.5 text-sm rounded-lg border border-gray-200 hover:border-orange-400 hover:text-orange-600 transition-colors"
+              className="px-3 py-2 text-sm rounded-xl border border-gray-200 hover:border-orange-400 hover:text-orange-600 hover:bg-orange-50 transition-all duration-150 font-medium"
             >
               {p.label}
             </button>
@@ -108,8 +108,8 @@ export default function ReportPage() {
           </div>
 
           {/* Revenue chart */}
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <h2 className="text-base font-semibold text-gray-800 mb-4">Doanh thu theo ngày</h2>
+          <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+            <h2 className="text-base font-bold text-gray-800 mb-4">Doanh thu theo ngày</h2>
             {data.dailyRevenue.length === 0 ? (
               <p className="text-gray-400 text-sm text-center py-8">Không có dữ liệu</p>
             ) : (
@@ -139,8 +139,8 @@ export default function ReportPage() {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Top items */}
-            <div className="bg-white rounded-xl shadow-sm p-6">
-              <h2 className="text-base font-semibold text-gray-800 mb-4">Top 10 món bán chạy</h2>
+            <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+              <h2 className="text-base font-bold text-gray-800 mb-4">Top 10 món bán chạy</h2>
               {data.topItems.length === 0 ? (
                 <p className="text-gray-400 text-sm text-center py-8">Không có dữ liệu</p>
               ) : (
@@ -171,8 +171,8 @@ export default function ReportPage() {
             </div>
 
             {/* Table stats */}
-            <div className="bg-white rounded-xl shadow-sm p-6">
-              <h2 className="text-base font-semibold text-gray-800 mb-4">Thống kê theo bàn</h2>
+            <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+              <h2 className="text-base font-bold text-gray-800 mb-4">Thống kê theo bàn</h2>
               {data.tableStats.length === 0 ? (
                 <p className="text-gray-400 text-sm text-center py-8">Không có dữ liệu</p>
               ) : (
@@ -206,8 +206,8 @@ export default function ReportPage() {
           </div>
 
           {/* Daily breakdown table */}
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <h2 className="text-base font-semibold text-gray-800 mb-4">Chi tiết doanh thu theo ngày</h2>
+          <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+            <h2 className="text-base font-bold text-gray-800 mb-4">Chi tiết doanh thu theo ngày</h2>
             {data.dailyRevenue.length === 0 ? (
               <p className="text-gray-400 text-sm text-center py-8">Không có dữ liệu</p>
             ) : (
@@ -247,13 +247,22 @@ export default function ReportPage() {
 }
 
 function StatCard({ icon, label, value, color }: { icon: string; label: string; value: string; color: "green" | "blue" | "orange" }) {
-  const colors = { green: "bg-green-50 text-green-700", blue: "bg-blue-50 text-blue-700", orange: "bg-orange-50 text-orange-700" };
+  const gradients = {
+    green: "from-emerald-500 to-green-600",
+    blue: "from-blue-500 to-blue-600",
+    orange: "from-orange-500 to-orange-600",
+  };
+  const textColors = {
+    green: "text-emerald-700",
+    blue: "text-blue-700",
+    orange: "text-orange-600",
+  };
   return (
-    <div className="bg-white rounded-xl shadow-sm p-5 flex items-center gap-4">
-      <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl ${colors[color]}`}>{icon}</div>
+    <div className="bg-white rounded-2xl shadow-sm p-5 flex items-center gap-4 border border-gray-100 hover:shadow-md transition-shadow duration-200">
+      <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${gradients[color]} flex items-center justify-center text-2xl text-white shrink-0`}>{icon}</div>
       <div>
-        <p className="text-sm text-gray-500">{label}</p>
-        <p className={`text-xl font-bold ${color === "green" ? "text-green-700" : color === "blue" ? "text-blue-700" : "text-orange-600"}`}>{value}</p>
+        <p className="text-sm text-gray-400 font-medium">{label}</p>
+        <p className={`text-xl font-bold ${textColors[color]} mt-0.5`}>{value}</p>
       </div>
     </div>
   );

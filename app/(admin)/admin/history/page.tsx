@@ -81,15 +81,15 @@ export default function HistoryPage() {
           {sessions.length > 0 && (
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
               {[
-                { icon: "📋", label: "Số phiên", value: sessions.length, color: "bg-orange-50" },
-                { icon: "🍽️", label: "Tổng món đã gọi", value: totalItems, color: "bg-blue-50" },
-                { icon: "💰", label: "Tổng doanh thu", value: formatPrice(totalRevenue), color: "bg-green-50", green: true },
+                { icon: "📋", label: "Số phiên", value: sessions.length, gradient: "from-orange-500 to-orange-600", textColor: "text-gray-900" },
+                { icon: "🍽️", label: "Tổng món đã gọi", value: totalItems, gradient: "from-blue-500 to-blue-600", textColor: "text-gray-900" },
+                { icon: "💰", label: "Tổng doanh thu", value: formatPrice(totalRevenue), gradient: "from-emerald-500 to-green-600", textColor: "text-emerald-700" },
               ].map((s) => (
-                <div key={s.label} className="bg-white rounded-xl shadow-sm p-5 flex items-center gap-4">
-                  <div className={`w-11 h-11 ${s.color} rounded-xl flex items-center justify-center text-xl`}>{s.icon}</div>
+                <div key={s.label} className="bg-white rounded-2xl shadow-sm p-5 flex items-center gap-4 border border-gray-100">
+                  <div className={`w-11 h-11 bg-gradient-to-br ${s.gradient} rounded-2xl flex items-center justify-center text-xl text-white shrink-0`}>{s.icon}</div>
                   <div>
-                    <p className="text-sm text-gray-500">{s.label}</p>
-                    <p className={`text-xl font-bold ${s.green ? "text-green-700" : "text-gray-900"}`}>{s.value}</p>
+                    <p className="text-sm text-gray-400 font-medium">{s.label}</p>
+                    <p className={`text-xl font-bold ${s.textColor} mt-0.5`}>{s.value}</p>
                   </div>
                 </div>
               ))}
@@ -108,7 +108,7 @@ export default function HistoryPage() {
                 const total = sessionTotal(session);
                 const itemCount = session.orders.flatMap((o) => o.items).reduce((s, i) => s + i.quantity, 0);
                 return (
-                  <div key={session.id} className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
+                  <div key={session.id} className="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-100 hover:shadow-md transition-shadow duration-200">
                     {/* Session header */}
                     <div className="flex items-center gap-2 px-4 py-3 sm:px-6 sm:py-4">
                       <button className="flex-1 text-left flex items-center justify-between gap-2 min-w-0" onClick={() => toggleExpand(session.id)}>

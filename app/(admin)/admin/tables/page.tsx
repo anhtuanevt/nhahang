@@ -146,7 +146,7 @@ export default function TablesPage() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Quản lý bàn</h1>
-          <p className="text-sm text-gray-500 mt-1">{tables.length} bàn</p>
+          <p className="text-sm text-gray-400 mt-1 font-medium">{tables.length} bàn</p>
         </div>
         <Button onClick={openAdd}>+ Thêm bàn</Button>
       </div>
@@ -160,7 +160,7 @@ export default function TablesPage() {
           const status = getTableStatus(table);
           const isReady = status === "ready";
           return (
-            <div key={table.id} className="bg-white rounded-xl shadow-sm p-5 flex flex-col gap-3">
+            <div key={table.id} className="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-3 border border-gray-100 hover:shadow-md transition-shadow duration-200">
               <div className="flex items-start justify-between">
                 <div>
                   <div className="text-xl font-bold text-gray-900">Bàn {table.number}</div>

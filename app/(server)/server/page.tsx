@@ -502,27 +502,31 @@ export default function ServerPage() {
   return (
     <div className="flex flex-col h-screen bg-gray-100 overflow-hidden">
       {/* Header */}
-      <header className="bg-gray-900 text-white px-4 py-3 flex items-center justify-between shrink-0 shadow-lg print:hidden">
-        <div className="flex items-center gap-3">
-          <span className="text-xl">🍜</span>
-          <span className="font-semibold text-lg hidden sm:inline">Màn hình phục vụ</span>
+      <header className="bg-gray-900 text-white px-4 py-3 flex items-center justify-between shrink-0 shadow-xl print:hidden">
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 bg-gradient-to-br from-orange-400 to-orange-600 rounded-xl flex items-center justify-center shadow-sm">
+              <span className="text-sm">🍜</span>
+            </div>
+            <span className="font-bold text-base hidden sm:inline tracking-tight">Màn hình phục vụ</span>
+          </div>
           {/* Tab switcher */}
-          <div className="flex bg-gray-700 rounded-lg p-0.5 gap-0.5">
+          <div className="flex bg-gray-800 rounded-xl p-1 gap-0.5">
             <button
               onClick={() => setActiveView("tables")}
-              className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${activeView === "tables" ? "bg-white text-gray-900" : "text-gray-300 hover:text-white"}`}
+              className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-all duration-150 min-h-[32px] ${activeView === "tables" ? "bg-white text-gray-900 shadow-sm" : "text-gray-400 hover:text-white"}`}
             >
-              🪑 Bàn
+              Bàn
             </button>
             <button
               onClick={() => setActiveView("history")}
-              className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${activeView === "history" ? "bg-white text-gray-900" : "text-gray-300 hover:text-white"}`}
+              className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-all duration-150 min-h-[32px] ${activeView === "history" ? "bg-white text-gray-900 shadow-sm" : "text-gray-400 hover:text-white"}`}
             >
-              📋 Lịch sử
+              Lịch sử
             </button>
           </div>
         </div>
-        <Button variant="ghost" size="sm" onClick={handleLogout} className="text-gray-300 hover:text-white hover:bg-gray-700">
+        <Button variant="ghost" size="sm" onClick={handleLogout} className="text-gray-400 hover:text-white hover:bg-gray-700">
           Đăng xuất
         </Button>
       </header>
@@ -554,7 +558,7 @@ export default function ServerPage() {
                 const itemCount = session.orders.flatMap((o) => o.items).reduce((s, i) => s + i.quantity, 0);
                 const expanded = expandedHistory.has(session.id);
                 return (
-                  <div key={session.id} className="border border-gray-100 rounded-xl overflow-hidden">
+                  <div key={session.id} className="border border-gray-100 rounded-2xl overflow-hidden bg-white hover:shadow-sm transition-shadow duration-200">
                     <button
                       className="w-full text-left px-4 py-3 flex items-center justify-between gap-2 hover:bg-gray-50 transition-colors"
                       onClick={() => setExpandedHistory((prev) => { const n = new Set(prev); n.has(session.id) ? n.delete(session.id) : n.add(session.id); return n; })}

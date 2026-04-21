@@ -175,7 +175,7 @@ export default function MenuPage() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Thực đơn</h1>
-          <p className="text-sm text-gray-500 mt-1">{items.length} món</p>
+          <p className="text-sm text-gray-400 mt-1 font-medium">{items.length} món</p>
         </div>
         <Button onClick={openAdd}>+ Thêm món</Button>
       </div>
@@ -190,9 +190,9 @@ export default function MenuPage() {
           <button
             key={cat}
             onClick={() => setCategoryFilter(cat)}
-            className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
+            className={`px-4 py-2 rounded-full text-sm font-semibold transition-all duration-200 min-h-[36px] ${
               categoryFilter === cat
-                ? "bg-orange-500 text-white"
+                ? "bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-sm shadow-orange-100"
                 : "bg-white text-gray-600 border border-gray-200 hover:border-orange-300 hover:text-orange-600"
             }`}
           >
@@ -202,7 +202,7 @@ export default function MenuPage() {
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-100">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-gray-100 bg-gray-50">

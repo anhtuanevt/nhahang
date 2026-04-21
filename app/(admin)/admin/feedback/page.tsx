@@ -165,7 +165,7 @@ export default function FeedbackPage() {
       <div className="flex items-center gap-3 mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Quản lý Feedback</h1>
         {allUnreadCount > 0 && (
-          <span className="inline-flex items-center rounded-full bg-red-100 px-3 py-1 text-sm font-semibold text-red-700">
+          <span className="inline-flex items-center rounded-full bg-red-100 px-3 py-1.5 text-sm font-bold text-red-700 ring-1 ring-red-200">
             {allUnreadCount} chưa đọc
           </span>
         )}
@@ -183,9 +183,9 @@ export default function FeedbackPage() {
           <button
             key={tab.value}
             onClick={() => setFilter(tab.value)}
-            className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
+            className={`px-4 py-2 rounded-full text-sm font-semibold transition-all duration-200 min-h-[36px] ${
               filter === tab.value
-                ? "bg-orange-500 text-white"
+                ? "bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-sm shadow-orange-100"
                 : "bg-white text-gray-600 border border-gray-200 hover:border-orange-300 hover:text-orange-600"
             }`}
           >
@@ -259,8 +259,8 @@ export default function FeedbackPage() {
           {feedbackList.map((fb) => (
             <div
               key={fb.id}
-              className={`bg-white rounded-xl shadow-sm border transition-colors ${
-                fb.status === "unread" ? "border-orange-200" : "border-transparent"
+              className={`bg-white rounded-2xl shadow-sm border transition-all duration-200 ${
+                fb.status === "unread" ? "border-orange-200 ring-1 ring-orange-100" : "border-gray-100"
               }`}
             >
               <div className="p-5">
