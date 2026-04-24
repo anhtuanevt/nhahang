@@ -3,12 +3,6 @@ builder = "nixpacks"
 buildCommand = "npm run build"
 
 [deploy]
-startCommand = "npx prisma migrate deploy && next start"
-healthcheckPath = "/"
-healthcheckTimeout = 30
+startCommand = "npm start"
 restartPolicyType = "on-failure"
 restartPolicyMaxRetries = 3
-
-[[deploy.envVars]]
-name = "PORT"
-value = "3000"
